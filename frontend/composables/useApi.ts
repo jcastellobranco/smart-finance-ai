@@ -9,7 +9,7 @@ export const useApi = () => {
 
   api.interceptors.request.use((request) => {
     if (import.meta.client) {
-      const token = window.localStorage.getItem('smart-finance-token')
+      const token = window.sessionStorage.getItem('smart-finance-token')
 
       if (token) {
         request.headers.Authorization = `Token ${token}`
