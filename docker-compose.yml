@@ -4,7 +4,7 @@ services:
     environment:
       POSTGRES_DB: smart_finance
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in your local .env file}
     ports:
       - "5432:5432"
 
@@ -44,10 +44,10 @@ services:
     environment:
       POSTGRES_DB: smart_finance
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in your local .env file}
       POSTGRES_HOST: db
       DEBUG: 'true'
-      SECRET_KEY: ${SECRET_KEY:-local-development-only-secret-key}
+      SECRET_KEY: ${SECRET_KEY:?Set SECRET_KEY in your local .env file}
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/1
     depends_on:
@@ -64,10 +64,10 @@ services:
     environment:
       POSTGRES_DB: smart_finance
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in your local .env file}
       POSTGRES_HOST: db
       DEBUG: 'true'
-      SECRET_KEY: ${SECRET_KEY:-local-development-only-secret-key}
+      SECRET_KEY: ${SECRET_KEY:?Set SECRET_KEY in your local .env file}
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/1
     depends_on:
