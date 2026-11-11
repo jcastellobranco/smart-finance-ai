@@ -8,6 +8,7 @@ class ReceiptUpload(models.Model):
     class Status(models.TextChoices):
         PENDING = "pending", "Pending"
         PROCESSING = "processing", "Processing"
+        REVIEW = "review", "Needs review"
         COMPLETED = "completed", "Completed"
         FAILED = "failed", "Failed"
 
