@@ -35,14 +35,14 @@ export const useAuthStore = defineStore('auth', {
     hydrate() {
       if (!import.meta.client) return
 
-      this.token = window.localStorage.getItem(tokenKey) || ''
+      this.token = window.sessionStorage.getItem(tokenKey) || ''
     },
 
     persist(token: string) {
       this.token = token
 
       if (import.meta.client) {
-        window.localStorage.setItem(tokenKey, token)
+        window.sessionStorage.setItem(tokenKey, token)
       }
     },
 
@@ -51,6 +51,7 @@ export const useAuthStore = defineStore('auth', {
       this.user = null
 
       if (import.meta.client) {
+        window.sessionStorage.removeItem(tokenKey)
         window.localStorage.removeItem(tokenKey)
       }
     },
