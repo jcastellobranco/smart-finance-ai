@@ -1,26 +1,17 @@
-from decimal import Decimal
-from datetime import date
-
-
-def fake_extract_receipt_data(file_path: str) -> dict:
-    """
-    MVP fake extractor.
-
-    Depois você troca isso por:
-    - OCR real
-    - regex
-    - LLM classification
-    """
-
-    return {
-        "merchant": "Example Market",
-        "description": "Receipt expense",
-        "amount": "89.90",
-        "date": str(date.today()),
-        "category": "Groceries",
-        "raw_text": "Example OCR text extracted from receipt.",
-    }
+"""Normalization and compatibility utilities for receipt extraction."""
+from decimal import Decimal, InvalidOperation
 
 
 def normalize_amount(value: str) -> Decimal:
-    return Decimal(str(value).replace(",", "."))
+    if value is None:
+        raise ValueError("Missing amount")
+    cleaned = str(value).strip().replace("R$", "").replace(" ", "")
+    if "," in cleaned:
+        cleaned = cleaned.replace(".", "").replace(",", ".")
+    try:
+        amount = Decimal(cleaned)
+    except InvalidOperation as exc:
+        raise ValueError("Invalid amount") from exc
+    if not amount.is_finite() or amount <= 0:
+        raise ValueError("Amount must be positive and finite")
+    return amount.quantize(Decimal("0.01"))
