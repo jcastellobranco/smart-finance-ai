@@ -1,3 +1,4 @@
+from django.db import transaction
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -21,9 +22,10 @@ class RegisterView(APIView):
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-
-        return Response(auth_payload(user), status=201)
+        with transaction.atomic():
+            user = serializer.save()
+            payload = auth_payload(user)
+        return Response(payload, status=201)
 
 
 class LoginView(APIView):
