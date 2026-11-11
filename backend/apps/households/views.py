@@ -1,22 +1,18 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 
-from .models import Household, HouseholdMember
+from .permissions import OwnerOrReadOnly
+from .selectors import visible_households
 from .serializers import HouseholdSerializer
+from .services import create_household
 
 
 class HouseholdViewSet(viewsets.ModelViewSet):
     serializer_class = HouseholdSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, OwnerOrReadOnly]
 
     def get_queryset(self):
-        return Household.objects.filter(members__user=self.request.user).distinct()
+        return visible_households(self.request.user)
 
     def perform_create(self, serializer):
-        household = serializer.save(owner=self.request.user)
-
-        HouseholdMember.objects.create(
-            household=household,
-            user=self.request.user,
-            role=HouseholdMember.Role.OWNER,
-        )
+        create_household(serializer=serializer, user=self.request.user)
