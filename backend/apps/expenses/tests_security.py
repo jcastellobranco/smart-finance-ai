@@ -51,17 +51,19 @@ class FinancialIsolationTests(TestCase):
         }, format="multipart")
         self.assertEqual(response.status_code, 400)
 
-    @patch("apps.receipts.tasks.fake_extract_receipt_data")
+    @patch("apps.receipts.tasks.extract_receipt")
     def test_receipt_processing_is_idempotent(self, extractor):
-        extractor.return_value = {
+        from apps.receipts.extraction import ExtractionResult
+        extractor.return_value = ExtractionResult(raw_text="receipt", fields={
             "merchant": "Store", "description": "Groceries", "amount": "25.00",
-            "date": str(date.today()), "category": "Groceries", "raw_text": "receipt",
-        }
+            "date": str(date.today()), "category": "Groceries",
+        })
         receipt = ReceiptUpload.objects.create(
             household=self.household, uploaded_by=self.owner,
             file="receipts/example.pdf",
         )
         process_receipt_task(receipt.pk)
         process_receipt_task(receipt.pk)
-        self.assertEqual(Expense.objects.filter(receipt_upload=receipt).count(), 1)
-        self.assertEqual(Expense.objects.get(receipt_upload=receipt).amount, Decimal("25.00"))
+        self.assertEqual(Expense.objects.filter(receipt_upload=receipt).count(), 0)
+        receipt.refresh_from_db()
+        self.assertEqual(receipt.status, ReceiptUpload.Status.REVIEW)
